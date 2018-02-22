@@ -25,21 +25,11 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-#include "GF256Number.h"
-#include "Matrix.h"
 #include "CauchyFEC.h"
 
-#include <cstdint>
 #include <iostream>
-#include <iomanip>
-#include <array>
-#include <exception>
-#include <cstring>
 #include <vector>
-#include <atomic>
-#include <algorithm>
-#include <thread>
+
 
 void makeRandomVector(std::vector<uint8_t>& output, unsigned int length) {
     output.resize(length);

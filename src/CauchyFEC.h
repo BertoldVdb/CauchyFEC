@@ -31,9 +31,6 @@
 #ifndef CAUCHYFEC_H_
 #define CAUCHYFEC_H_
 
-using RSGF256Number = GF256Number<>;
-
-
 class CauchyFEC {
 public:
     static void init();
