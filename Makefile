@@ -29,8 +29,8 @@ CC=$(CCARCH)gcc
 CPP=$(CCARCH)g++
 STRIP=$(CCARCH)strip
 
-CFLAGS=-fPIC -std=c++1y -O3 -Wall -c -fmessage-length=0 -Werror
-LDFLAGS=-shared
+CFLAGS=-fPIC -std=c++1y -O3 -Wall -c -fmessage-length=0 -Werror -ffunction-sections -fdata-sections -fvisibility=hidden
+LDFLAGS=-shared -fvisibility=hidden
 
 EXECUTABLE=liberasure.so
 INCLUDES=CauchyFECImpl.h GF256Number.h Matrix.h CauchyFEC.h

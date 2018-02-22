@@ -31,18 +31,20 @@
 #ifndef CAUCHYFEC_H_
 #define CAUCHYFEC_H_
 
+#define CAUCHYFEC_H_EXPORT_FUNCTION __attribute__((visibility("default")))
+
 class CauchyFEC {
 public:
-    static void init();
-    CauchyFEC();
-    ~CauchyFEC();
+    static CAUCHYFEC_H_EXPORT_FUNCTION void init();
+    CAUCHYFEC_H_EXPORT_FUNCTION CauchyFEC();
+    CAUCHYFEC_H_EXPORT_FUNCTION ~CauchyFEC();
 
-    void reset(bool encode, unsigned int numberOfSourcePackets = 0);
-    void operator<<(const std::vector<uint8_t>& sourcePacket);
-    void operator<<(const std::vector<std::vector<uint8_t>>& sourcePackets);
-    unsigned int requestPackets(std::vector<std::vector<uint8_t>>& outputPackets, unsigned int numPackets = 1);
-    bool operator>>(std::vector<uint8_t>& outputPackets);
-    bool operator>>(std::vector<std::vector<uint8_t>>& outputPackets);
+    void CAUCHYFEC_H_EXPORT_FUNCTION reset(bool encode, unsigned int numberOfSourcePackets = 0);
+    void CAUCHYFEC_H_EXPORT_FUNCTION operator<<(const std::vector<uint8_t>& sourcePacket);
+    void CAUCHYFEC_H_EXPORT_FUNCTION operator<<(const std::vector<std::vector<uint8_t>>& sourcePackets);
+    unsigned int CAUCHYFEC_H_EXPORT_FUNCTION requestPackets(std::vector<std::vector<uint8_t>>& outputPackets, unsigned int numPackets = 1);
+    bool CAUCHYFEC_H_EXPORT_FUNCTION operator>>(std::vector<uint8_t>& outputPackets);
+    bool CAUCHYFEC_H_EXPORT_FUNCTION operator>>(std::vector<std::vector<uint8_t>>& outputPackets);
 
 private:
     class impl;
