@@ -26,9 +26,7 @@
  */
 
 #include <vector>
-#include <cstdint>
-#include "Matrix.h"
-#include "GF256Number.h"
+#include <memory>
 
 #ifndef CAUCHYFEC_H_
 #define CAUCHYFEC_H_
@@ -38,98 +36,20 @@ using RSGF256Number = GF256Number<>;
 
 class CauchyFEC {
 public:
-    static void init() {
-        RSGF256Number::init();
-    }
+    static void init();
+    CauchyFEC();
+    ~CauchyFEC();
 
-    CauchyFEC() {
-        reset(false, 0);
-    }
-
-    inline void reset(bool encode, unsigned int numberOfSourcePackets = 0) {
-        isEncoder_ = encode;
-        if(isEncoder_) {
-            encoderReset(numberOfSourcePackets);
-        } else {
-            decoderReset();
-        }
-    }
-
-    inline void operator<<(const std::vector<uint8_t>& sourcePacket) {
-        if(isEncoder_) {
-            encoderOperatorLL(sourcePacket);
-        } else {
-            decoderOperatorLL(sourcePacket);
-        }
-    }
-
-    inline void operator<<(const std::vector<std::vector<uint8_t>>& sourcePackets) {
-        if(isEncoder_) {
-            encoderOperatorLL(sourcePackets);
-        } else {
-            decoderOperatorLL(sourcePackets);
-        }
-    }
-
-    inline unsigned int requestPackets(std::vector<std::vector<uint8_t>>& outputPackets, unsigned int numPackets = 1) {
-        if(isEncoder_) {
-            return encoderRequestPackets(outputPackets, numPackets);
-        } else {
-            return decoderRequestPackets(outputPackets, numPackets);
-        }
-    }
-
-    inline bool operator>>(std::vector<uint8_t>& outputPackets) {
-        std::vector<std::vector<uint8_t>> tmp;
-
-        if(requestPackets(tmp, 1)) {
-            outputPackets = std::move(tmp[0]);
-            return true;
-        }
-
-        return false;
-    }
-
-    inline bool operator>>(std::vector<std::vector<uint8_t>>& outputPackets) {
-        return requestPackets(outputPackets, 1) > 0;
-    }
+    void reset(bool encode, unsigned int numberOfSourcePackets = 0);
+    void operator<<(const std::vector<uint8_t>& sourcePacket);
+    void operator<<(const std::vector<std::vector<uint8_t>>& sourcePackets);
+    unsigned int requestPackets(std::vector<std::vector<uint8_t>>& outputPackets, unsigned int numPackets = 1);
+    bool operator>>(std::vector<uint8_t>& outputPackets);
+    bool operator>>(std::vector<std::vector<uint8_t>>& outputPackets);
 
 private:
-
-    /* Shared */
-    void getGeneratorRow(Matrix<RSGF256Number>& target, unsigned int row, unsigned int sourcePackets);
-
-    unsigned int numSourcePackets_;
-    bool isEncoder_;
-
-    /* Encoder part */
-    void encoderReset(unsigned int numSourcePackets);
-    void encoderOperatorLL(const std::vector<uint8_t>& sourcePacket);
-    void encoderOperatorLL(const std::vector<std::vector<uint8_t>>& sourcePackets);
-    void encoderBuildMessageMatrix();
-    void encoderIncrementGenerator();
-    unsigned int encoderRequestPackets(std::vector<std::vector<uint8_t>>& packets, unsigned int numPackets);
-
-    std::vector<std::vector<uint8_t>> encoderSourcePackets_;
-    unsigned int encoderLongestSourcePacket_;
-    bool encoderReadingSourcePackets_;
-    unsigned int encoderGeneratorRowIndex_;
-    Matrix<RSGF256Number> encoderMessageMatrix_;
-
-    /* Decoder part */
-    void decoderReset();
-    void decoderOperatorLL(const std::vector<uint8_t>& inputPacket);
-    void decoderOperatorLL(const std::vector<std::vector<uint8_t>>& inputPacket);
-    bool decoderMatrixInverse(Matrix<RSGF256Number>& matrix);
-    unsigned int decoderRequestPackets(std::vector<std::vector<uint8_t>>& packets, unsigned int numPackets);
-    bool decoderRun();
-
-    bool decoderWaitingFirstPacket_;
-    bool decoderStuck_;
-    unsigned int decoderOriginalPacketsReceived_;
-    unsigned int decoderPacketsReturned_;
-    std::vector<std::vector<uint8_t>> decoderPacketBuffer_;
-
+    class impl;
+    std::unique_ptr<impl> impl_;
 };
 
 #endif /* CAUCHYFEC_H_ */

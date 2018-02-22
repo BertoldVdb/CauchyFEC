@@ -26,37 +26,34 @@
  */
 
 #include "CauchyFECImpl.h"
+#include "Matrix.h"
+#include "GF256Number.h"
 
-void CauchyFEC::init() {
-    CauchyFEC::impl::init();
+
+void CauchyFEC::impl::getGeneratorRow(Matrix<RSGF256Number>& target, unsigned int row, unsigned int sourcePackets) {
+    /* Identity part */
+    if(row < sourcePackets) {
+        for(unsigned int col = 0; col < sourcePackets; col++) {
+            target(0, col) = (row == col)? 1 : 0;
+        }
+        return;
+    }
+
+    /* Line of ones (allows easy XOR decoding) */
+    if(row == sourcePackets) {
+        for(unsigned int col = 0; col < sourcePackets; col++) {
+            target(0, col) = 1;
+        }
+        return;
+    }
+
+    /* Cauchy elements */
+    for(unsigned int col = 0; col < sourcePackets; col++) {
+        /* row starts at sourcePackets + 1 */
+        RSGF256Number x = 255 - row;
+        /* 255 - sourcePackets is not used, as this 'slot' was used by the row of ones */
+        RSGF256Number y = 255 - sourcePackets + col + 1;
+
+        target(0, col) = RSGF256Number(1)/(x+y);
+    }
 }
-
-CauchyFEC::CauchyFEC():
-    impl_(new impl()) {
-}
-
-void CauchyFEC::reset(bool encode, unsigned int numberOfSourcePackets) {
-    impl_->reset(encode, numberOfSourcePackets);
-}
-
-void CauchyFEC::operator<<(const std::vector<uint8_t>& sourcePacket) {
-    impl_->operator<<(sourcePacket);
-}
-
-void CauchyFEC::operator<<(const std::vector<std::vector<uint8_t>>& sourcePackets) {
-    impl_->operator<<(sourcePackets);
-}
-
-unsigned int CauchyFEC::requestPackets(std::vector<std::vector<uint8_t>>& outputPackets, unsigned int numPackets) {
-    return impl_->requestPackets(outputPackets, numPackets);
-}
-
-bool CauchyFEC::operator>>(std::vector<uint8_t>& outputPackets) {
-    return impl_->operator>>(outputPackets);
-}
-
-bool CauchyFEC::operator>>(std::vector<std::vector<uint8_t>>& outputPackets) {
-    return impl_->operator>>(outputPackets);
-}
-
-CauchyFEC::~CauchyFEC() = default;

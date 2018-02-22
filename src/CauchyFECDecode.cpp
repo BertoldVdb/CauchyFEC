@@ -25,9 +25,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "CauchyFEC.h"
+#include "CauchyFECImpl.h"
 
-bool CauchyFEC::decoderMatrixInverse(Matrix<RSGF256Number>& matrix) {
+bool CauchyFEC::impl::decoderMatrixInverse(Matrix<RSGF256Number>& matrix) {
     if(matrix.rows() != matrix.columns()) {
         throw std::runtime_error("Matrix not square");
     }
@@ -87,14 +87,14 @@ bool CauchyFEC::decoderMatrixInverse(Matrix<RSGF256Number>& matrix) {
     return true;
 }
 
-void CauchyFEC::decoderReset() {
+void CauchyFEC::impl::decoderReset() {
     decoderWaitingFirstPacket_ = true;
     decoderOriginalPacketsReceived_ = 0;
     decoderPacketsReturned_ = 0;
     decoderStuck_ = false;
 }
 
-void CauchyFEC::decoderOperatorLL(const std::vector<uint8_t>& inputPacket) {
+void CauchyFEC::impl::decoderOperatorLL(const std::vector<uint8_t>& inputPacket) {
     /* No point in reading more packets if we won't be able to produce output */
     if(decoderStuck_) {
         return;
@@ -134,13 +134,13 @@ void CauchyFEC::decoderOperatorLL(const std::vector<uint8_t>& inputPacket) {
     }
 }
 
-void CauchyFEC::decoderOperatorLL(const std::vector<std::vector<uint8_t>>& inputPackets) {
+void CauchyFEC::impl::decoderOperatorLL(const std::vector<std::vector<uint8_t>>& inputPackets) {
     for(auto& inputPacket: inputPackets) {
         decoderOperatorLL(inputPacket);
     }
 }
 
-bool CauchyFEC::decoderRun() {
+bool CauchyFEC::impl::decoderRun() {
     /* How many parity packets will we use */
     unsigned int parityPacketsNeeded = numSourcePackets_ - decoderOriginalPacketsReceived_;
     if(!parityPacketsNeeded) {
@@ -281,7 +281,7 @@ bool CauchyFEC::decoderRun() {
     return true;
 }
 
-unsigned int CauchyFEC::decoderRequestPackets(std::vector<std::vector<uint8_t>>& packets, unsigned int numPackets) {
+unsigned int CauchyFEC::impl::decoderRequestPackets(std::vector<std::vector<uint8_t>>& packets, unsigned int numPackets) {
     if(decoderStuck_) {
         return 0;
     }

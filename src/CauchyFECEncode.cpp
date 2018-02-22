@@ -25,12 +25,12 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "CauchyFEC.h"
+#include "CauchyFECImpl.h"
 #include "Matrix.h"
 #include "GF256Number.h"
 #include <stdexcept>
 
-void CauchyFEC::encoderReset(unsigned int numSourcePackets) {
+void CauchyFEC::impl::encoderReset(unsigned int numSourcePackets) {
     encoderSourcePackets_.clear();
     encoderGeneratorRowIndex_ = 0;
     encoderReadingSourcePackets_ = true;
@@ -42,7 +42,7 @@ void CauchyFEC::encoderReset(unsigned int numSourcePackets) {
     }
 }
 
-void CauchyFEC::encoderOperatorLL(const std::vector<uint8_t>& sourcePacket) {
+void CauchyFEC::impl::encoderOperatorLL(const std::vector<uint8_t>& sourcePacket) {
     if(!sourcePacket.size()) {
         throw std::runtime_error("size() == 0 packets are not supported");
     }
@@ -62,14 +62,14 @@ void CauchyFEC::encoderOperatorLL(const std::vector<uint8_t>& sourcePacket) {
     encoderSourcePackets_.push_back(sourcePacket);
 }
 
-void CauchyFEC::encoderOperatorLL(const std::vector<std::vector<uint8_t>>& sourcePackets) {
+void CauchyFEC::impl::encoderOperatorLL(const std::vector<std::vector<uint8_t>>& sourcePackets) {
     encoderSourcePackets_.reserve(encoderSourcePackets_.size() + sourcePackets.size());
     for(auto& i: sourcePackets) {
         encoderOperatorLL(i);
     }
 }
 
-void CauchyFEC::encoderBuildMessageMatrix() {
+void CauchyFEC::impl::encoderBuildMessageMatrix() {
     unsigned int index = 0;
     encoderMessageMatrix_ = Matrix<RSGF256Number>(numSourcePackets_, encoderLongestSourcePacket_ + 2);
 
@@ -86,14 +86,14 @@ void CauchyFEC::encoderBuildMessageMatrix() {
     }
 }
 
-void CauchyFEC::encoderIncrementGenerator() {
+void CauchyFEC::impl::encoderIncrementGenerator() {
     encoderGeneratorRowIndex_++;
     if(encoderGeneratorRowIndex_ > 256) {
         throw std::runtime_error("Can't generate more packets");
     }
 }
 
-unsigned int CauchyFEC::encoderRequestPackets(std::vector<std::vector<uint8_t>>& packets, unsigned int numPackets) {
+unsigned int CauchyFEC::impl::encoderRequestPackets(std::vector<std::vector<uint8_t>>& packets, unsigned int numPackets) {
     /* First packets are not encoded */
     unsigned int count = 0;
     for(count = 0; count < numPackets; count++) {

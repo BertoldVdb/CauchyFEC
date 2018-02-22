@@ -29,12 +29,12 @@ CC=$(CCARCH)gcc
 CPP=$(CCARCH)g++
 STRIP=$(CCARCH)strip
 
-CFLAGS=-std=c++1y -O3 -Wall -c -fmessage-length=0 -Werror
-LDFLAGS=
+CFLAGS=-fPIC -std=c++1y -O3 -Wall -c -fmessage-length=0 -Werror
+LDFLAGS=-shared
 
-EXECUTABLE=fecdemo
-INCLUDES=CauchyFEC.h GF256Number.h Matrix.h
-SOURCES=CauchyFEC.cpp CauchyFECDecode.cpp CauchyFECEncode.cpp demo.cpp
+EXECUTABLE=liberasure.so
+INCLUDES=CauchyFECImpl.h GF256Number.h Matrix.h CauchyFEC.h
+SOURCES=CauchyFEC.cpp CauchyFECDecode.cpp CauchyFECEncode.cpp CauchyFECGenerator.cpp
 
 
 OBJECTS_OBJ=$(addprefix obj/,$(SOURCES:.cpp=.o))
